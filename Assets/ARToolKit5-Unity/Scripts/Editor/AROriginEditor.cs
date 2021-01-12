@@ -35,33 +35,39 @@
  *
  */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEditor;
-using UnityEngine;
-using System.IO;
+using UnityEditor.SceneManagement;
 
 [CustomEditor(typeof(AROrigin))]
 public class AROriginEditor : Editor
 {
-	
-    public override void OnInspectorGUI()
+    public AROrigin o;
+
+    public void Awake()
     {
-		// Get the AROrigin that this panel will edit.
-        AROrigin o = (AROrigin)target;
-        if (o == null) return;
-		
-		// Find mode		
-		o.findMarkerMode = (AROrigin.FindMode)EditorGUILayout.EnumPopup("ARMarker find mode", o.findMarkerMode);
-		
-		if (o.findMarkerMode == AROrigin.FindMode.AutoByTags) {
-			serializedObject.Update();
-			EditorGUILayout.PropertyField(serializedObject.FindProperty("findMarkerTags"), true);
-			serializedObject.ApplyModifiedProperties();
-			//o.FindMarkers();
-		}
+        o = (AROrigin)target;
     }
 
+    public override void OnInspectorGUI()
+    {
+        if (o == null) return;
+        EditorGUI.BeginChangeCheck();
+        // Find mode
+        o.findMarkerMode = (AROrigin.FindMode)EditorGUILayout.EnumPopup("ARMarker find mode", o.findMarkerMode);
+
+        if (o.findMarkerMode == AROrigin.FindMode.AutoByTags)
+        {
+            serializedObject.Update();
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("findMarkerTags"), true);
+            serializedObject.ApplyModifiedProperties();
+            //o.FindMarkers();
+        }
+
+        if (EditorGUI.EndChangeCheck())
+        {
+            // This code will unsave the current scene if there's any change in the editor GUI.
+            // Hence user would forcefully need to save the scene before changing scene
+            EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
+        }
+    }
 }

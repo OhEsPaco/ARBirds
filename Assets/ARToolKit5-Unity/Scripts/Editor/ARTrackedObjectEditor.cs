@@ -35,36 +35,47 @@
  *
  */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 
-[CustomEditor(typeof(ARTrackedObject))] 
-public class ARTrackedObjectEditor : Editor 
+[CustomEditor(typeof(ARTrackedObject))]
+public class ARTrackedObjectEditor : Editor
 {
+    public ARTrackedObject arto;
+
+    public void Awake()
+    {
+        arto = (ARTrackedObject)target;
+    }
+
     public override void OnInspectorGUI()
     {
-		ARTrackedObject arto = (ARTrackedObject)target;
-		if (arto == null) return;
+        if (arto == null) return;
+        EditorGUI.BeginChangeCheck();
+        arto.MarkerTag = EditorGUILayout.TextField("Marker tag", arto.MarkerTag);
 
-		arto.MarkerTag = EditorGUILayout.TextField("Marker tag", arto.MarkerTag);
+        ARMarker marker = arto.GetMarker();
+        EditorGUILayout.LabelField("Got marker", marker == null ? "no" : "yes");
+        if (marker != null)
+        {
+            string type = ARMarker.MarkerTypeNames[marker.MarkerType];
+            EditorGUILayout.LabelField("Marker UID", (marker.UID != ARMarker.NO_ID ? marker.UID.ToString() : "Not loaded") + " (" + type + ")");
+        }
 
-		ARMarker marker = arto.GetMarker();
-		EditorGUILayout.LabelField("Got marker", marker == null ? "no" : "yes");
-		if (marker != null) {
-			string type = ARMarker.MarkerTypeNames[marker.MarkerType];
-			EditorGUILayout.LabelField("Marker UID", (marker.UID != ARMarker.NO_ID ? marker.UID.ToString() : "Not loaded") + " (" + type + ")");	
-		}
-		
-		EditorGUILayout.Separator();
-		
-		arto.secondsToRemainVisible = EditorGUILayout.FloatField("Stay visible", arto.secondsToRemainVisible);
-		
-		EditorGUILayout.Separator();
-		
-		arto.eventReceiver = (GameObject)EditorGUILayout.ObjectField("Event Receiver:", arto.eventReceiver, typeof(GameObject), true);
-	}
+        EditorGUILayout.Separator();
+
+        arto.secondsToRemainVisible = EditorGUILayout.FloatField("Stay visible", arto.secondsToRemainVisible);
+
+        EditorGUILayout.Separator();
+
+        arto.eventReceiver = (GameObject)EditorGUILayout.ObjectField("Event Receiver:", arto.eventReceiver, typeof(GameObject), true);
+
+        if (EditorGUI.EndChangeCheck())
+        {
+            // This code will unsave the current scene if there's any change in the editor GUI.
+            // Hence user would forcefully need to save the scene before changing scene
+            EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
+        }
+    }
 }

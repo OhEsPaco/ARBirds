@@ -108,7 +108,7 @@ public class ARController : MonoBehaviour
     //
 
     // Config. in.
-    public string videoCParamName0 = "camera_para";
+    public string videoCParamName0 = "";
     public string videoConfigurationWindows0 = "-showDialog -flipV";
     public string videoConfigurationMacOSX0 = "-width=640 -height=480";
     public string videoConfigurationiOS0 = "";

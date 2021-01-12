@@ -41,6 +41,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using UnityEngine;
+using UnityEngine.Networking;
 
 public enum MarkerType
 {
@@ -169,13 +170,13 @@ public class ARMarker : MonoBehaviour
 	{
 		if (!File.Exists(System.IO.Path.Combine(Application.temporaryCachePath, basename))) {
 			string file = System.IO.Path.Combine(Application.streamingAssetsPath, basename); // E.g. "jar:file://" + Application.dataPath + "!/assets/" + basename;
-			WWW unpackerWWW = new WWW(file);
+			UnityWebRequest unpackerWWW = new UnityWebRequest(file);
 			while (!unpackerWWW.isDone) { } // This will block in the webplayer. TODO: switch to co-routine.
 			if (!string.IsNullOrEmpty(unpackerWWW.error)) {
 				ARController.Log(LogTag + "Error unpacking '" + file + "'");
 				return (false);
 			}
-			File.WriteAllBytes(System.IO.Path.Combine(Application.temporaryCachePath, basename), unpackerWWW.bytes); // 64MB limit on File.WriteAllBytes.
+			File.WriteAllBytes(System.IO.Path.Combine(Application.temporaryCachePath, basename), unpackerWWW.downloadHandler.data); // 64MB limit on File.WriteAllBytes.
 		}
 		return (true);
 	}

@@ -35,37 +35,48 @@
  *
  */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 
-[CustomEditor(typeof(ARTransitionalCamera))] 
-public class ARTransitionalCameraEditor : ARTrackedCameraEditor 
+[CustomEditor(typeof(ARTransitionalCamera))]
+public class ARTransitionalCameraEditor : ARTrackedCameraEditor
 {
+    public ARTransitionalCamera artc;
+
+    public void Awake()
+    {
+        artc = (ARTransitionalCamera)target;
+    }
+
     public override void OnInspectorGUI()
     {
         base.OnInspectorGUI();
 
-		ARTransitionalCamera artc = (ARTransitionalCamera)target;
-
+        EditorGUI.BeginChangeCheck();
 
         EditorGUILayout.Separator();
-		
-		bool allowSceneObjects = !EditorUtility.IsPersistent(artc);
-		artc.targetObject = (GameObject)EditorGUILayout.ObjectField(artc.targetObject, artc.targetObject.GetType(), allowSceneObjects);
 
-		artc.vrTargetPosition = EditorGUILayout.Vector3Field("VR Position", artc.vrTargetPosition);
+        bool allowSceneObjects = !EditorUtility.IsPersistent(artc);
+        artc.targetObject = (GameObject)EditorGUILayout.ObjectField(artc.targetObject, artc.targetObject.GetType(), allowSceneObjects);
 
-		artc.transitionAmount = EditorGUILayout.Slider(artc.transitionAmount, 0, 1);
+        artc.vrTargetPosition = EditorGUILayout.Vector3Field("VR Position", artc.vrTargetPosition);
 
-		artc.automaticTransition = EditorGUILayout.Toggle("Automatic Transition", artc.automaticTransition);
-		if (artc.automaticTransition) {
-			artc.automaticTransitionDistance = EditorGUILayout.FloatField("Transition Distance", artc.automaticTransitionDistance);
-		}
+        artc.transitionAmount = EditorGUILayout.Slider(artc.transitionAmount, 0, 1);
 
-		artc.movementRate = EditorGUILayout.FloatField("VR movement speed (m/s)", artc.movementRate);
+        artc.automaticTransition = EditorGUILayout.Toggle("Automatic Transition", artc.automaticTransition);
+        if (artc.automaticTransition)
+        {
+            artc.automaticTransitionDistance = EditorGUILayout.FloatField("Transition Distance", artc.automaticTransitionDistance);
+        }
+
+        artc.movementRate = EditorGUILayout.FloatField("VR movement speed (m/s)", artc.movementRate);
+
+        if (EditorGUI.EndChangeCheck())
+        {
+            // This code will unsave the current scene if there's any change in the editor GUI.
+            // Hence user would forcefully need to save the scene before changing scene
+            EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
+        }
     }
 }
