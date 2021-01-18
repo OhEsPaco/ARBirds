@@ -36,7 +36,7 @@ public class Shooter : MonoBehaviour
     [SerializeField]
     private float minimumDelayShot = 5;
 
-    public GameObject scene;
+
 
     private GameObject newBullet;
 

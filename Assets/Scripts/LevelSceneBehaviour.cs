@@ -9,7 +9,7 @@ public class LevelSceneBehaviour : MonoBehaviour
     [SerializeField]
     private ARTrackedObject canon;
 
-    private float distanceToRestart = 0.14f;
+    private float distanceToRestart = 0.20f;
 
     private GameObject instantiatedLevel;
 
